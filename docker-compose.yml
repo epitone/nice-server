@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  server:
+    image: nice-server
+    container_name: nice
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      labels:
+        - nice
+    ports:
+      - 3000:3000
+    working_dir: /app
