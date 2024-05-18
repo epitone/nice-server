@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Session } from '@nestjs/common';
 import { AppService } from './app.service';
 import {
   NiceCryptoTokenApiReqQueryDto,
@@ -19,17 +19,21 @@ export class AppController {
   @Get('/crypto/token')
   async getCryptoToken(
     @Query() queryDto: NiceCryptoTokenApiReqQueryDto,
+    @Session() session: Record<string, any>,
   ): Promise<NiceCryptoTokenApiRes> {
-    console.log(queryDto);
-    const data = await this.appService.getNiceCryptoToken(queryDto.returnUrl);
+    const data = await this.appService.getNiceCryptoToken(
+      queryDto.returnUrl,
+      session,
+    );
     return data;
   }
 
   @Get('/callback')
   async getCallback(
     @Query() queryDto: NiceCallbackApiReqQueryDto,
+    @Session() session: Record<string, any>,
   ): Promise<string> {
-    const data = await this.appService.getCallback(queryDto);
+    const data = await this.appService.getCallback(queryDto, session);
     return data;
   }
 }

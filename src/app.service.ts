@@ -30,7 +30,7 @@ export class AppService {
     }
   }
 
-  async getNiceCryptoToken(returnUrl: string) {
+  async getNiceCryptoToken(returnUrl: string, session: Record<string, any>) {
     try {
       // 1. 암호화 토큰 요청
       const nowDate = new Date();
@@ -39,7 +39,7 @@ export class AppService {
       // 요청시간(초)
       const currentTimestamp = Math.floor(nowDate.getTime() / 1000);
       // 요청고유번호(30자리)
-      console.log(uuid4());
+
       const reqNo: string = uuid4().substring(0, 30);
 
       const cryptoTokenData = await this.appRepository.getNiceCryptoToken(
@@ -55,6 +55,13 @@ export class AppService {
         cryptoTokenData.tokenVal,
       );
 
+      // 대칭키 세션 저장
+      session.nice_key = {
+        key: key,
+        iv: iv,
+      };
+
+      console.log(session);
       // 3-1. 요청 데이터 암호화
       const requestno = reqNo; // 서비스 요청 고유 번호(*)
       const returnurl = returnUrl; // 인증결과를 받을 url(*)
@@ -90,11 +97,12 @@ export class AppService {
     }
   }
 
-  async getCallback(queryDto: NiceCallbackApiReqQueryDto): Promise<any> {
+  async getCallback(
+    queryDto: NiceCallbackApiReqQueryDto,
+    session: Record<string, any>,
+  ): Promise<any> {
     try {
-      const decryptKey = 'test';
-      const { key, iv }: { key: string; iv: string } = JSON.parse(decryptKey);
-
+      const { key, iv }: { key: string; iv: string } = session.nice_key;
       const decData = this.decryptData(queryDto.enc_data, key, iv);
       return decData;
     } catch (error) {
@@ -179,7 +187,6 @@ export class AppService {
     // 'binary'에서 'euc-kr'로 디코딩
     decrypted = iconv.decode(Buffer.from(decrypted, 'binary'), 'euc-kr');
 
-    console.log(decrypted);
     return JSON.parse(decrypted);
   }
 }

@@ -41,8 +41,6 @@ export class AppRepository implements NiceApiRepository {
         },
       },
     });
-
-    console.log(response);
     const resData = response.data;
 
     // 사이트 코드, 서버 토큰 값, 서버 토큰 버전 반환
@@ -60,8 +58,6 @@ export class AppRepository implements NiceApiRepository {
       const authorization = Buffer.from(clientId + ':' + clientSecret).toString(
         'base64',
       );
-      console.log(clientId);
-      console.log(clientSecret);
       const dataBody = {
         scope: 'default',
         grant_type: 'client_credentials',
@@ -76,10 +72,7 @@ export class AppRepository implements NiceApiRepository {
         },
         data: dataBody,
       });
-      // console.log(response);
-
       const token = response.data.dataBody.access_token;
-      console.log(token);
       return token;
     } catch (error) {
       throw new InternalServerErrorException(error);
